@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::collections::HashMap;
 //use std::io::prelude::*;
+use std::io::{self, BufRead};
 
 fn main() -> std::io::Result<()> {
     println!("Hello, Jon!");
@@ -11,15 +12,29 @@ fn main() -> std::io::Result<()> {
 
     let replace_file = File::open("./data/Google.html")?;
     let mut buffer = String::new();
-    let result = replace(replace_file,String::from("pattern"), account_details, &mut buffer);
-    println!("Buffer={:?}", buffer);
+    let result = replace(replace_file,String::from("{{"), String::from("}}"), account_details, &mut buffer);
 
     Ok(())
 }
 
 
 // Tag a file and process it replacing any tags with the appropriate value from a hashmap
-fn replace<'a> (in_file: File, tag_pattern: String, values: &HashMap<String, String>, buffer: &'a mut String) -> &'a String {
+fn replace<'a> (in_file: File, start_tag_pattern: String, end_tag_pattern: String, replacement_values: &HashMap<String, String>, buffer: &'a mut String) -> &'a String {
+
+    // Read the file until the start tag_pattern is found
+    let mut cursor = io::Cursor::new(b"lorem-ipsum");
+    let mut buf = vec![];
+    
+    // cursor is at 'l'
+    let num_bytes = cursor.read_until(b'-', &mut buf)
+        .expect("reading from cursor won't fail");
+    assert_eq!(num_bytes, 6);
+    assert_eq!(buf, b"lorem-");
+    buf.clear();
+    
+
+    println!("Replacement_values={:?}", buffer);
+
     buffer.push_str("Rubbish");
     buffer
 }
